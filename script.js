@@ -1,62 +1,99 @@
 'use strict';
 
-const playerOneScore = document.getElementById('score--0');
-const playerTwoScore = document.getElementById('score--1');
 const dice = document.querySelector('.dice');
 const buttonNewGame = document.querySelector('.btn--new');
 const buttonRollDice = document.querySelector('.btn--roll');
 const buttonHold = document.querySelector('.btn--hold');
 
-const scores = [0,0];
 
 let currentScore = 0;
 
 let player = 0;
 
+let winFlag = false;
 
-const highLightPlayer = function(){
-    const playerPlaying = document.querySelector(`player--${player}`);
-    playerPlaying.classList.add('player--active');
-    const deactivatedPlayer = document.querySelector(`player--${player === 0 ? 1 :  0}`);
-    deactivatedPlayer.classList.remove('player--active');
-
+const setScore = (player, score) => {
+    document.getElementById(`current--${player}`).textContent = score;
 }
 
-const changePlayer = ()=> player === 0 ? player = 1 : player = 0;
 
-
-const getScore = function (player) {
-    return Number(document.getElementById(`current--${player}`).textContent);
-}
-
-const changeScore = (player, score) => {
+const setGlobalScore = (player, score) => {
     document.getElementById(`score--${player}`).textContent = score;
 }
 
-const changeTotalScore = (score)=>  document.getElementById(`current--${player}`).textContent = score;
-
-const resetGame = () => {
-    changeScore(0, 0);
-    changeScore(1, 0);
-    dice.classList.add('hidden');
+const getGlobalScore = function () {
+    return Number(document.getElementById(`score--${player}`).textContent);
 }
 
-resetGame();
+const highLightPlayer = function () {
+    for (var i = 0; i < 2; i++) document.querySelector(`.player--${i}`).classList.toggle('player--active');
+}
+
+
+const resetGame = function(full) {
+    dice.classList.add('hidden');
+    if (full) {
+        document.querySelector(`.player--0`).classList.remove('player--winner');
+        document.querySelector(`.player--1`).classList.remove('player--winner');
+        document.querySelector(`.player--0`).classList.add('player--active');
+        document.querySelector(`.player--1`).classList.remove('player--active');
+        currentScore = 0;
+        player = 0;
+        winFlag = false;
+        setGlobalScore(0, 0);
+        setGlobalScore(1, 0);
+
+    }
+    setScore(0, 0);
+    setScore(1, 0);
+}
+
+
+const changePlayer = () => player === 0 ? player = 1 : player = 0;
+
+const displayWinMessage = () => {
+    document.querySelector(`.player--${player}`).classList.remove('player--active');
+    document.querySelector(`.player--${player}`).classList.add('player--winner');
+}
 
 const rollDice = () => {
-    const diceNumber = Math.trunc(Math.random() * 6) + 1;
-    dice.src = `dice-${diceNumber}.png`;
-    dice.classList.remove('hidden');
-    if (diceNumber === 1) {
-        currentScore = 0;
-        changePlayer();
-        highLightPlayer();
-    } else {
-        currentScore = getScore(player);
-        currentScore += diceNumber;
-        if (player ===0) playerOneScore.textContent = currentScore;
-        else playerTwoScore.textContent = currentScore;
+    if (!winFlag) {
+        const diceNumber = Math.trunc(Math.random() * 6) + 1;
+        dice.src = `dice-${diceNumber}.png`;
+        dice.classList.remove('hidden');
+        if (diceNumber === 1) {
+            currentScore = 0;
+            setScore(player, currentScore);
+            changePlayer();
+            highLightPlayer();
+        } else {
+            currentScore += diceNumber;
+            setScore(player, currentScore);
+        }
     }
 }
 
+
+const updateScore = () => {
+    if (!winFlag) {
+        setGlobalScore(player, (currentScore + getGlobalScore(changePlayer)));
+        if (getGlobalScore() >= 10) {
+            displayWinMessage();
+            winFlag = true;
+        };
+        currentScore = 0;
+        resetGame(false);
+        changePlayer();
+        highLightPlayer();
+    }
+
+}
+
+resetGame(true);
+
 buttonRollDice.addEventListener('click', rollDice);
+buttonHold.addEventListener('click', updateScore);
+buttonNewGame.addEventListener('click', function(){
+    resetGame(true);
+});
+
