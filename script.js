@@ -77,7 +77,7 @@ const rollDice = () => {
 const updateScore = () => {
     if (!winFlag) {
         setGlobalScore(player, (currentScore + getGlobalScore(changePlayer)));
-        if (getGlobalScore() >= 10) {
+        if (getGlobalScore() >= 100) {
             displayWinMessage();
             winFlag = true;
         };
