@@ -30,7 +30,7 @@ const highLightPlayer = function () {
 }
 
 
-const resetGame = function(full) {
+const resetGame = function (full) {
     dice.classList.add('hidden');
     if (full) {
         document.querySelector(`.player--0`).classList.remove('player--winner');
@@ -93,7 +93,7 @@ resetGame(true);
 
 buttonRollDice.addEventListener('click', rollDice);
 buttonHold.addEventListener('click', updateScore);
-buttonNewGame.addEventListener('click', function(){
+buttonNewGame.addEventListener('click', function () {
     resetGame(true);
 });
 
